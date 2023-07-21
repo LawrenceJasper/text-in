@@ -1,0 +1,34 @@
+let recipients = [
+    {number: '+15863824742', nameFirst: 'Cody', nameLast: 'Basham', group: ""},
+    {number: '+12483900343', nameFirst: 'Don', nameLast: 'Bernier Jr', group: ""},
+    {number: '+12488218015', nameFirst: 'Angelique', nameLast: 'Thomas', group: ""}
+];
+
+
+let employees = [
+    // {number: '+13135239620', nameFirst: 'Aaron', nameLast: 'Windham', group: "", status: 'allow'},
+    {number: '+12488218015', nameFirst: 'Angelique', nameLast: 'Thomas', group: "", status: 'allow'},
+    {number: '+12489356956', nameFirst: 'Brandon', nameLast: 'Taucher', group: "", status: 'allow'},
+    {number: '+12484621552', nameFirst: 'Brianna', nameLast: 'Clippart', group: "", status: 'allow'},
+    {number: '+15863824742', nameFirst: 'Cody', nameLast: 'Basham', group: "", status: 'allow'},
+    // {number: '+12482961853', nameFirst: 'Dan', nameLast: 'Stokes', group: "", status: 'allow'},
+    // {number: '+12486782295', nameFirst: 'Darren', nameLast: 'Stellhorn', group: "", status: 'allow'},
+    {number: '+12484825856', nameFirst: 'Deon', nameLast: 'Wright', group: "", status: 'allow'},
+    {number: '+12483900343', nameFirst: 'Don', nameLast: 'Bernier Jr', group: "", status: 'allow'},
+    {number: '+12489353563', nameFirst: 'Gary', nameLast: 'Williams', group: "", status: 'allow'},
+    {number: '+19892808420', nameFirst: 'Greg', nameLast: 'Corneja', group: "", status: 'allow'},
+    {number: '+12488218026', nameFirst: 'Jay', nameLast: 'Chaiser', group: "", status: 'allow'},
+    // {number: '+12488917368', nameFirst: 'Jeffery', nameLast: 'Thomas', group: "", status: 'allow'},
+    {number: '+17088603025', nameFirst: 'John', nameLast: 'Ronk', group: "", status: 'allow'},
+    // {number: '+17205523469', nameFirst: 'Justin', nameLast: 'Chaiser', group: "", status: 'allow'},
+    // {number: '+15868791836', nameFirst: 'Kody', nameLast: 'Matthew', group: "", status: 'allow'},
+    {number: '+15869458588', nameFirst: 'Larry', nameLast: 'Slowik', group: "", status: 'allow'},
+    // {number: '+13138504665', nameFirst: 'Malique', nameLast: 'Paxton', group: "", status: 'allow'},
+    {number: '+12487658528', nameFirst: 'Max', nameLast: 'Schmitt', group: "", status: 'allow'},
+    // {number: '+15864822770', nameFirst: 'Nick', nameLast: 'Farrah', group: "", status: 'allow'},
+    // {number: '+12488912848', nameFirst: 'Rebbecca', nameLast: 'Miller', group: "", status: 'allow'},
+    {number: '+12487596450', nameFirst: 'Ryan', nameLast: 'Hamlin', group: "", status: 'allow'},
+    {number: '+12484946764', nameFirst: 'Sean', nameLast: 'LeBlanc', group: "", status: 'allow'},
+    // {number: '+12488182124', nameFirst: 'Tony', nameLast: 'Sterret', group: "", status: 'allow'},
+    {number: '+12489171359', nameFirst: 'Tyler', nameLast: 'McDonald', group: "", status: 'allow'},
+];

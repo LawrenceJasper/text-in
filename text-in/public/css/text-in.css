@@ -1,0 +1,209 @@
+@font-face                         { font-family: 'home_font'; src: url("../fonts/Poppins-Regular.ttf") format('truetype')}
+@font-face                         { font-family: 'larry'; src: url("../fonts/toon.otf") format('truetype')}
+@font-face                         { font-family: 'ubuntu'; src: url("../fonts/ub.ttf") format('truetype')}
+:root                              { --blockColor : #f4f4f4;--backColor : #e7e7e7;--sidebarColor: #777777;--buttonColor : #284269;--hoverColor : #000000;--loadingBar : green;--loadingBar2 : #00bd00;--loadingBar3 : #00cc00;--loadingBar4 : #00ff00;}
+body                               { margin: 0; padding: 0; background-color: rgba(0, 0, 0, 0.66);-webkit-user-select: none; -ms-user-select: none; -moz-user-select: none; user-select: none; overflow:hidden}
+.btn                               { position: relative;display: inline-block;padding:15px 25px;border: none;border-radius: 10px;background-color: #ffffff;font-size: 24px;font-family: 'home_font';color: #000000;cursor: pointer;text-align: center;text-decoration: none;outline: none;box-shadow: 0 6px #999;}
+.btn:hover                         { background-color: #1f7ea1;color: white}
+.btn:active                        { background-color: #1f7ea1;color: white;box-shadow: 0 5px #666;transform: translateY(4px);}
+.buttons_component                 { position: relative;height: 100px;border-radius: 10px;left: 50%;transform: translate(-50%, 0);text-align: center;}
+.title                             { position: relative;padding-bottom: 25px;padding-top: 90px; font-family:larry;font-size: 38px;color: white;text-align: center;}
+.fileInfo                          { position: relative; width: 43%; max-height: 350px; border-radius: 10px; left: 50%; transform:translate(-50%,0); overflow: auto;}
+#bar                               { position: relative; left: 50%; transform: translate(-50%,0);}
+.ldBar-label                       { font-family: 'home_font'; font-size: 2.2em; font-weight: 900; color: #000000}
+.del                               { position: relative; display: inline-block; width: 125px; margin-top: 15px; margin-right: 1%; padding: 10px; border: none; border-radius: 10px; background-color: #ffffff; font-family: 'larry'; font-weight: bold; font-size: 14px; color: #000000; left: 0; cursor: pointer; text-align: center; box-shadow: 0 6px #999; height: 35px; line-height: 35px;}
+.del:hover                         { border-radius: 10px; background-color: #145094; color: white; cursor: pointer;}
+.del:active                        { background-color: #145094; color: white; box-shadow: 0 5px #666; transform: translateY(4px);}
+.blue                              { background-color: #145094; color: white}
+#success                           { color: white}
+#deleted                           { font-weight: bold; color: #ff9191}
+#deleted_all                       { font-weight: bold; color: #ff9191}
+#sync                              { font-weight: bold; color: #c7fdc7}
+#warn                              { font-weight: bold; color: #ffffff}
+#canceled                          { font-weight: bold; color: #ffd391}
+.msg                               { position: relative; display: none; width: 200px; font-family: 'home_font'; transform: translate(-50%,0); text-align: center; top: 10px; left: 50%;}
+.btn_holder                        { position: relative; width: 100%; text-align: center; left: 50.5%; transform: translate(-50%, 0); top: -5px;}
+.fileInfo::-webkit-scrollbar       { width: 0.4vw}
+.fileInfo::-webkit-scrollbar-thumb {border-radius: 5px; background-color: var(--buttonColor)}
+.fileInfo::-webkit-scrollbar-track {border-radius: 5px; background-color: rgb(231, 231, 231)}
+
+#vueApp{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    /*background-image: url("../photos/phone.jpg");*/
+    /*background-size: cover;*/
+
+    overflow: auto;
+    background-color: white;
+}
+
+.blur{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    backdrop-filter: blur(10px);
+}
+
+.header{
+    position: relative;
+    width: 100%;
+    height: 75px;
+    background-color: #d4d4d4a8;
+    backdrop-filter: blur(10px);
+    font-family: home_font;
+    font-size: 32px;
+    text-align: center;
+    line-height: 75px;
+    color: #4b4b4b;
+}
+
+
+.main_table{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    /*background-color: black;*/
+}
+
+/*.main_table td{*/
+/*    overflow-x: hidden;*/
+/*    overflow-y: auto;*/
+/*}*/
+
+
+.table_list{
+    position: relative;
+    width: 100%;
+    /*height: 100%;*/
+    /*background-color: #d4d4d4a8;*/
+    backdrop-filter: blur(10px);
+    font-family: home_font;
+    font-size: 14px;
+    text-align: center;
+    /*line-height: 75px;*/
+}
+
+.table_list tr:hover                           { background-color: rgba(31, 126, 161, 0.70);color: white;cursor: pointer;}
+
+
+
+.table_list th {
+    font-size: 16px;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    /*background-color: black;*/
+    /*color: white;*/
+}
+
+
+/*.table_list tr,th,td{*/
+/*    line-height: 35px;*/
+/*    height: 35px;*/
+/*}*/
+
+
+/*.table_list tr:nth-child(even)                 { background-color: rgba(203, 204, 208, 0.63)*/
+/*}*/
+/*.table_list tr:nth-child(odd)                 { background-color: #cbccd0*/
+/*}*/
+
+.list{
+    height: 100%;
+    /*height: 90%;*/
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.table_header{
+    position: sticky;
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+    font-family: home_font;
+    text-align: center;
+    font-size: 16px;
+    top: 1px;
+}
+
+
+.form{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    left: 50%;
+    transform: translate(-50%);
+    text-align: center;
+
+}
+
+.text_input{
+    position: relative;
+    width: 150px;
+    height: 35px;
+    line-height: 35px;
+    font-family: home_font;
+    text-align: left;
+    text-indent: 7px;
+    font-size: 16px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    background-color: white;
+    margin-bottom: 7px;
+    margin-top: 7px;
+}
+
+.create_account{
+    position: relative;
+    background-color: #a5d7a5;
+    height: 100%;
+    width: 100%;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.label{
+    position: relative;
+    font-family: home_font;
+    font-size: 18px;
+    text-align: center;
+    display: block;
+    /*width: 185px;*/
+}
+
+.select{
+    position: relative;
+    width: 155px;
+    height: 35px;
+    line-height: 35px;
+    font-family: home_font;
+    font-size: 18px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    background-color: white;
+    margin-bottom: 7px;
+    margin-top: 7px;
+
+}
+
+.submit_btn{
+    position: relative;
+    height: 45px;
+    width: 125px;
+    font-family: home_font;
+    border-radius: 15px;
+    font-size: 18px;
+
+}
+
+/*.table_list th{*/
+/*    height: auto;*/
+/*    line-height: 35px;*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*}*/

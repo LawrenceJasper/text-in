@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes"> <!--this header code allows to have the screen go over the notch-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover,user-scalable=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <script src = ./modules/jquery.js></script>
+    <script type="text/javascript" src="./modules/xlsx.js"></script>
+    <script  src="./modules/lzutf8.js"></script>
+    <script src="./modules/chart.js"></script>
+    <script src="./modules/vue.js"></script>
+    <script src="./modules/socket.io.js"></script>
+    <script type="text/javascript" src="./modules/FileSaver.js"></script>
+    <script src="./modules/moment.js"></script>
+    <script src="./modules/axios.js"></script>
+<!--    <link rel="stylesheet" type="text/css" href="./loading/loading-bar.css"/>-->
+    <link rel="stylesheet" type="text/css" href="./css/text-in.css"/>
+<!--    <script type="text/javascript" src="./loading/loading-bar.js"></script>-->
+    <title>Text-In</title>
+</head>
+
+<body>
+
+<div id = vueApp>
+    <div class="blur">
+        <table class = main_table>
+            <tr>
+                <th colspan="2" class="header">Employee Text-In</th>
+            </tr>
+            <tr style="height: 50%">
+                <td style="width: 50%; background-color: #bfc2ce">
+                    <employee_list class="list"></employee_list>
+                </td>
+                <td style="width: 50%; background-color: yellow">
+                    <create_account class = create_account></create_account>
+                </td>
+            </tr>
+
+            <tr style="height: 50%">
+                <td style="width: 50%; background-color: #bdc4c6">
+                    <recipients_list class="list"></recipients_list>
+                </td>
+                <td style="width: 50%; background-color: orange">
+<!--                    <remove_account></remove_account>-->
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+
+    let webSocket                                      = io.connect(location.host);
+    let msg;
+    let diagnostic                                     = true;
+
+
+
+    webSocket.on('connect', function(data) {
+        webSocket.emit('js', JSON.stringify({type:'get_employee_list'}));
+        // webSocket.emit('js', JSON.stringify({type:'get_recipient_list'}));
+    })
+
+    webSocket.on('html', function(data) {
+        try {
+            msg = JSON.parse(data);
+
+            switch (msg.type) {
+                case 'display_files':
+                    app.$root.$emit(`display_files`, msg.data);
+                    break;
+                case 'employee_list':
+                    console.log(msg.data);
+                    app.$root.$emit('employee_list', msg.data);
+                    break;
+                case 'recipient_list':
+                    console.log(msg.data);
+                    app.$root.$emit('recipient_list', msg.data);
+                    break;
+                default:
+                    break;
+            }
+        } catch (ex) {
+            console.log(ex.message);
+        }
+    })
+
+
+    Vue.component('create_account', {
+        template: // template
+            `
+              <div>
+              <div class=table_header style="background-color: rgba(0,127,0,0.3)">Create Account</div>
+              <div class=form>
+                <input type="text" class=text_input placeholder="First Name" v-model="sub_form.fName">
+                <input type="text" class=text_input placeholder="Last Name" v-model="sub_form.lName">
+                <input type="text" class=text_input placeholder="Phone Number" v-model="sub_form.phone">
+                <div class = label >List Type:</div>
+                <select class = select  name="listType" id="listType" v-model="sub_form.list_type">
+                  <option :value="item.Name" v-for="item in list_types">{{item.Name}}</option>
+                </select>
+                <button class = submit_btn @click="add_person(sub_form)">Submit</button>
+              </div>
+
+              </div>
+
+            `,
+        data(){
+            return {
+                sub_form:{
+                    fName: '',
+                    lName: '',
+                    phone: '',
+                    list_type: '',
+                    status: 'allow',
+                },
+                list_types:[
+                    {Name: 'employee'},
+                    {Name: 'recipient'},
+                ],
+                hold: undefined,
+
+            }
+        },
+        methods: {
+            activate(id) {
+                this.hold = id;
+            },
+            add_person(form){
+                webSocket.emit('js', JSON.stringify({type:'add_person', data:form}));
+            }
+
+        },
+        computed:{ // runs when data received...
+
+        },
+        mounted(){
+
+            this.$root.$on(`display_files`, (data)=>{
+
+                if(diagnostic){console.log(data)}
+                this.files.splice(0);
+
+                data.forEach(file=>{
+                    this.files.push(file);
+                })
+            })
+            this.$root.$on(`get_selected_delete`, ()=>{
+
+                this.$root.$emit('selected_delete', (this.hold));
+            })
+            this.$root.$on(`get_selected_download`, ()=>{
+
+                this.$root.$emit('selected_download', (this.hold));
+            })
+            this.$root.$on(`get_all_files`, ()=>{
+
+                this.$root.$emit('existing_files', (this.files));
+            })
+            this.$root.$on(`clear_active`, ()=>{
+                this.activate(undefined);
+            })
+
+        }
+    })
+    Vue.component('employee_list', {
+        template: // template
+            `
+              <div>
+              <div class=table_header style="background-color: #bec0cc">Employee List</div>
+              <table class=table_list>
+                <!--                <tr>-->
+                <!--                  <th colspan="5">Employee List</th>-->
+                <!--                </tr>-->
+                <tr style="background-color: #bec0cc">
+                  <th style="background-color: #bec0cc">First Name</th>
+                  <th style="background-color: #bec0cc">Last Name</th>
+                  <th style="background-color: #bec0cc">Group</th>
+                  <th style="background-color: #bec0cc">Status</th>
+                  <th style="background-color: #bec0cc">Number</th>
+                </tr>
+                <tr v-for="index in this.employees" :class="{ blue : hold === index.number, file_button: hold !== index.number }" @click="activate(index.number)" @touchstart="activate(index.number)">
+                  <td>{{ index.nameFirst }}</td>
+                  <td>{{ index.nameLast }}</td>
+                  <td>{{ index.group }}</td>
+                  <td>{{ index.status }}</td>
+                  <td>{{ index.number }}</td>
+                </tr>
+              </table>
+              </div>
+
+            `,
+        data(){
+            return {
+                employees:[],
+                hold: undefined,
+
+            }
+        },
+        methods: {
+            activate(id) {
+                this.hold = id;
+            },
+
+        },
+        computed:{ // runs when data received...
+
+        },
+        mounted(){
+
+            this.$root.$on(`employee_list`, (data)=>{
+                this.employees.splice(0);
+                this.employees = data;
+            })
+
+        }
+    })
+    Vue.component('recipients_list', {
+        template: // template
+            `
+              <div>
+              <div class=table_header>Recipients List</div>
+              <table class=table_list>
+                <!--                <tr>-->
+                <!--                  <th colspan="5">Recipients List</th>-->
+                <!--                </tr>-->
+                <tr style="background-color: #bcc2c4">
+                  <th style="background-color: #bcc2c4">First Name</th>
+                  <th style="background-color: #bcc2c4">Last Name</th>
+                  <th style="background-color: #bcc2c4">Group</th>
+                  <th style="background-color: #bcc2c4">Status</th>
+                  <th style="background-color: #bcc2c4">Number</th>
+                </tr>
+                <tr v-for="index in this.recipients" :class="{ blue : hold === index.number, file_button: hold !== index.number }" @click="activate(index.number)" @touchstart="activate(index.number)">
+                  <td>{{ index.nameFirst }}</td>
+                  <td>{{ index.nameLast }}</td>
+                  <td>{{ index.group }}</td>
+                  <td>{{ index.status }}</td>
+                  <td>{{ index.number }}</td>
+                </tr>
+              </table>
+              </div>
+
+            `,
+        data(){
+            return {
+                recipients:[],
+                hold: undefined,
+
+            }
+        },
+        methods: {
+            activate(id) {
+                this.hold = id;
+            },
+
+        },
+        computed:{ // runs when data received...
+
+        },
+        mounted(){
+
+            this.$root.$on(`recipient_list`, (data)=>{
+                this.recipients.splice(0);
+                this.recipients = data;
+            })
+
+        }
+    })
+    Vue.component('dyn_buttons', {
+        template: // template
+            `
+              <div class=btn_holder>
+              <div class=del @click="sendMessage()" @touchstart="sendMessage()">Send Text</div>
+              </div>
+
+            `,
+        data(){
+            return {
+
+            }
+        },
+        methods: {
+
+            sendMessage(){
+                webSocket.emit('js', JSON.stringify({type:'send_text'}));
+
+            },
+            deleteFile(){
+
+                app.$root.$emit('get_selected_delete');
+
+            },
+            deleteFileAll(files){
+                if(files.length !== 0){
+                    let execute = confirm(`Are you sure you want clear all files?`);
+
+                    if(execute === true){
+                        webSocket.emit('delete_file_all');
+                        this.activate(undefined);
+                    }else{
+                        if(diagnostic){console.log(`process cancelled...`)}
+                    }
+                }else{
+                    alert(`No files exist`);
+                }
+            },
+            downloadFile(){
+                app.$root.$emit('get_selected_download');
+            },
+            downloadAll(){
+
+                app.$root.$emit('get_all_files');
+
+            },
+            cancel(){
+                if(uploadInProgress === true){
+                    if(noCancel === false){
+                        controller.abort();
+                        document.getElementById('canceled').style.display = 'block';
+                        setTimeout(()=>{
+                            uploadInProgress = false;
+                            noCancel = false;
+                            loadingBar.set(0);
+                            document.getElementById('canceled').style.display = 'none';
+                        },1000)
+
+                    }else{
+                        alert('Too late to cancel upload...');
+                    }
+                }else{
+                    alert(`No upload to cancel.`);
+                }
+            },
+            syncFiles(){
+                webSocket.emit(`sync_files`);
+            },
+
+        },
+        computed:{ // runs when data received...
+        },
+        mounted(){
+            this.$root.$on('selected_delete',(file_to_delete)=>{
+                if(file_to_delete !== undefined){
+                    let execute = confirm(`Are you sure you want to execute this action on ${file_to_delete}?`);
+
+                    if(execute === true){
+                        webSocket.emit('delete_file', file_to_delete);
+                        app.$root.$emit('clear_active');
+                    }else{
+                        if(diagnostic){console.log(`process cancelled...`)}
+                    }
+                }else{
+                    alert('No file selected');
+                }
+
+
+            })
+            this.$root.$on('selected_download',(index)=>{
+
+                if(index !== undefined){
+                    if(diagnostic){console.log(index)}
+
+                    let address = `./displayassets/${index}`;
+
+
+                    if(diagnostic){console.log(address)}
+
+                    let element = document.getElementById('d_link'); // grab element
+
+                    element.setAttribute('href', address); // set link
+
+                    element.click(); // simulate click event
+
+                }else{
+                    alert(`No file selected`);
+                }
+
+            })
+            this.$root.$on('existing_files',(files)=>{
+                if(files.length !== 0){
+                    if(diagnostic){console.log(files)}
+
+                    let address;
+
+                    files.forEach(file=> {
+
+                        address = `./displayassets/${file}`;
+
+                        if(diagnostic){console.log(address)}
+
+                        let element = document.getElementById('d_link'); // grab element
+
+                        element.setAttribute('href', address); // set link
+
+                        element.click(); // simulate click event
+                    })
+                }else{
+                    alert(`No files exist`);
+                }
+
+            })
+
+        }
+    })
+
+
+    let app = new Vue({
+        el: '#vueApp',
+        data(){
+            return{
+            }
+        },
+        methods:{},
+        mounted(){
+
+        }
+    })
+
+</script>
+</body>
+</html>

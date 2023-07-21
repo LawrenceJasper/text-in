@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta name="viewport" content=" user-scalable=0, initial-scale=1.0, width=320.1, maximum-scale=1" media="device-height: 960px" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- <link href="https://fonts.googleapis.com/css?family=Michroma" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,800" rel="stylesheet">
+    <title>Employee TextIn</title>
+
+    <style>
+        .noSelect               { user-select: none; }
+
+        .mainContainer          { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: 0; padding: 0;
+                                  color: #2ba3ce; font-size: 40px; font-family: 'Montserrat', sans-serif; font-weight: 300; }
+        .headerContainer        { position: relative; top: 0; left: 0; width: 100%; height: 60px; line-height: 60px;
+                                  text-align: center; font-size: 32px; color: #2ab3ce; background-color: #f4f4f4; }
+        .default                { position: relative; top: 0; left: 0; width: 100%; height: 60px; line-height: 60px;
+                                  text-align: center; font-size: 32px; color: #2ab3ce; }
+
+        .employeeListContainer  { position: relative; top: 0; left: 0; width: 100%; }
+        .employeeListHeader     { position: relative; top: 0; left: 0; width: 100%; height: 40px; }
+        .employeeList           { position: relative; top: 0; width: 350px; margin: auto; list-style: none; padding: 0; margin: 0; text-align: center; display: block; }
+        .employeeListItem       { position: relative; width: 100%; font-size: 14px; text-align: left; height: 20px; }
+        .listItemNameFirst      { position: absolute; left: 20px; width: 100px; height: 20px; line-height: 20px; }
+        .listItemNameLast       { position: absolute; left: 120px; width: 100px; height: 20px; line-height: 20px; }
+        .listItemPhone          { position: absolute; left: 220px; width: 150px; height: 20px; line-height: 20px; }
+
+        .employeeLogItem        { position: relative; width: 100%; font-size: 14px; text-align: left; height: 20px; }
+        .employeeLogDate        { position: absolute; left: 20px; width: 100px; height: 20px; line-height: 20px; }
+        .employeeLogTime        { position: absolute; left: 120px; width: 100px; height: 20px; line-height: 20px; }
+        .employeeLogPhone       { position: absolute; left: 220px; width: 150px; height: 20px; line-height: 20px; }
+        .employeeLogName        { position: absolute; left: 360px; width: 150px; height: 20px; line-height: 20px; }
+        .employeeLogMessage     { position: absolute; left: 510px; width: 400px; height: 20px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    </style>
+</head>
+
+<body>
+
+<div class="mainContainer">
+    <div class="headerContainer">Employee TextIn</div>
+
+    <div class="employeeListContainer">
+        <div class="employeeListHeader"></div>
+        <ul id="employeeList" class="employeeList">
+            <li style="width: 100%; height: 40px; "></li>
+        </ul>
+        <ul id="employeeLog" class="emplyeeLogList">
+
+        </ul>
+    </div>
+</div>
+
+
+<script src="./modules/jquery.js"></script>
+<script src="./modules/moment.js"></script>
+<script src="./modules/socket.io.js"></script>
+<script>
+    let eList                               = [];
+    let msg;
+    let webSocket                           = io.connect(location.host);
+
+    webSocket.on('connect', function(data) {
+        webSocket.emit('estatus', JSON.stringify({type: "connect" }));
+    });
+
+    webSocket.on('estatus', function(data) {
+        try {
+            msg                             = JSON.parse(data);
+            switch (msg.type) {
+                case 'cack':
+                    eList                   = msg.eList;
+                    $('#employeeList').empty();
+
+                    eList.forEach(function(item, index, arr) {
+                        let phoneNum        = item.number;
+                        $('#employeeList').append('<li class="employeeListItem">' +
+                            '<div class="listItemNameFirst">' + item.nameFirst +'</div>' +
+                            '<div class="listItemNameLast">' + item.nameLast +'</div>' +
+                            '<div class="listItemPhone">' + "(" + phoneNum.substr(2, 3) + ") " + phoneNum.substr(5, 3) + "-" + phoneNum.substr(8, 4) + '</div>' +
+                            '</li>');
+                    });
+
+
+                    let logList             = msg.log.split('\n');
+
+                    logList.forEach(function(item, idex,arr) {
+                        let logItem         = item.split('_~_');
+
+                        if (logItem[0] != "") {
+                            $('#employeeLog').append('<li class="employeeLogItem">' +
+                                '<div class="employeeLogDate">' + logItem[0] +'</div>' +
+                                '<div class="employeeLogTime">' + logItem[1] +'</div>' +
+                                '<div class="employeeLogPhone">' + logItem[3] +'</div>' +
+                                '<div class="employeeLogName">' + logItem[4] +'</div>' +
+                                '<div class="employeeLogMessage">' + logItem[5] +'</div>' +
+                                '</li>');
+
+                        }
+
+                        console.log(logItem);
+                    });
+
+
+
+                    break;
+
+                case 'status':
+                    break;
+
+                default:
+                    break;
+            }
+        } catch (ex) { }
+    });
+
+</script>
+</body>
+</html>
